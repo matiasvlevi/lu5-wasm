@@ -1,0 +1,1 @@
+export type PlatformFunction = (...args: any) => any;
