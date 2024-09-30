@@ -1,10 +1,8 @@
 # lu5-wasm
 
-This is a minimal JavaScript polyfill for the [lu5](https://github.com/matiasvlevi/lu5) interpreter when used in WebAssembly.
-
+A minimal javascript polyfill for the [lu5](https://github.com/matiasvlevi/lu5) interpreter when used in WebAssembly.
 
 <br/>
-
 
 ## Getting Started
 
