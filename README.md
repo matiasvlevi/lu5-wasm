@@ -21,7 +21,7 @@ Add a script
     end
 
     function draw()
-        background('purple');
+        background('magenta');
     end
 </script>
 ```
