@@ -50,7 +50,7 @@ Add the `lib` attribute to the script tag to enable library mode
 Instantiate `lu5` with the wasm binary and execute scripts.
 
 ```js
-lu5.init('./lu5.wasm')
+lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
     .then(vm => vm.execute(`print('Hello from lu5!')`))
     .then(vm => vm.execute(`
         function setup()
@@ -68,7 +68,7 @@ lu5.init('./lu5.wasm')
 You can use variables created from a previous execute calls
 
 ```js
-lu5.init('./lu5.wasm')
+lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
     .then(vm => vm.execute('x = 12'))
     .then(vm => vm.execute('y = 18'))
     .then(vm => vm.execute('print(x + y)'));
@@ -77,7 +77,7 @@ lu5.init('./lu5.wasm')
 Call `lu5.reset` to clear memory
 
 ```js
-lu5.init('./lu5.wasm')
+lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
     .then(vm => vm.execute('x = 12'))
     .then(vm => vm.reset())
     .then(vm => vm.execute('print(x)')); // nil
