@@ -10,7 +10,7 @@ This is a minimal JavaScript polyfill for the [lu5](https://github.com/matiasvle
 
 Add the `lu5-wasm` library from a CDN
 
-```xml
+```htm
 <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js"></script>
 ```
 
@@ -42,11 +42,13 @@ This mode avoids looking for any lua scripts in the html document, instead, it e
 
 Add the `lib` attribute to the script tag to enable library mode
 
-```xml
-<script lib src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js"></script>
+```htm
+<script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js" lib></script>
 ```
 
 <br/>
+
+## Library usage
 
 Instantiate `lu5` with the wasm binary and execute scripts.
 
