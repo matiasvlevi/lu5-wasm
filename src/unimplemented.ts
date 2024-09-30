@@ -1,51 +1,19 @@
-const lu5_bindings_expected = [
-    'lu5_getCursorPos',
-    'lu5_init_freetype',
-    'lu5_close_fonts',
-    'lu5_render_text',
-    'lu5_load_default_font',
-    'lu5_load_and_add_font',
-    'lu5_set_font',
-    'lu5_time_seed',
-    'lu5_createWindow',
+const lu5_bindings_unimplemented = [
     'lu5_image_crop',
     'lu5_load_image',
     'lu5_render_image',
     'lu5_apply_color',
-    'lu5_background',
-    'lu5_glBegin',
-    'lu5_glVertex2',
-    'lu5_glEnd',
-    'lu5_render_ellipse',
-    'lu5_render_ring',
-    'lu5_render_arc_fill',
-    'lu5_render_arc_stroke',
-    'lu5_render_quad_fill',
-    'lu5_render_quad_stroke',
-    'lu5_render_debug',
-    'lu5_render_box_faces',
-    'lu5_render_box_edges',
-    'lu5_render_cylinder_faces',
-    'lu5_render_cylinder_edges',
-    'lu5_render_torus_faces',
-    'lu5_render_torus_edges',
-    'lu5_render_plane_faces',
-    'lu5_render_plane_edges',
-    'lu5_render_sphere_faces',
-    'lu5_render_sphere_edges'
+    'lu5_glVertex2'
 ];
 
-const wasi_snapshot_preview1_expected = [
+const wasi_snapshot_preview1_unimplemented = [
     'args_get',
     'args_sizes_get',
     'environ_get',
     'environ_sizes_get',
-    'clock_res_get',
-    'clock_time_get',
     'fd_close',
     'fd_prestat_get',
     'fd_prestat_dir_name',
-    'fd_write',
     'fd_read',
     'fd_seek',
     'proc_exit',
@@ -96,4 +64,4 @@ const wasi_snapshot_preview1_expected = [
     'sock_send',
 ];
 
-export { lu5_bindings_expected, wasi_snapshot_preview1_expected };
+export { lu5_bindings_unimplemented, wasi_snapshot_preview1_unimplemented };

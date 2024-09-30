@@ -1,14 +1,14 @@
 {
   "name": "lu5-wasm",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.1",
+  "main": "dist/lu5-wasm.min.js",
   "scripts": {
     "build": "webpack --config webpack.config.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [ "lu5", "lua", "p5", "creative coding", "web", "wasm", "webassembly", "wasi" ],
+  "author": "Matias Vazquez-Levi",
+  "license": "MIT",
+  "description": "A Javascript polyfill for lu5 in the browser",
   "devDependencies": {
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",

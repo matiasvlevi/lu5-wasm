@@ -1,22 +1,8 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = {
-    entry: [
-        './src/types.ts',
-        './src/expected.ts',
-        './src/glfw.ts',
-        './src/lu5.ts',
-        './src/wasi.ts',
-        './src/platform/geometry/2D.ts',
-        './src/platform/geometry/3D.ts',
-        './src/platform/index.ts',
-        './src/index.ts',
-    ],
-    output: {
-        filename: 'lu5-wasm.min.js',
-        path: path.resolve(__dirname, 'dist')
-    },
+const baseConfig = {
+    entry: ['./src/index.ts'],
     resolve: {
         extensions: ['.ts'],
     },
@@ -29,9 +15,31 @@ module.exports = {
             },
         ],
     },
-    optimization: {
-        minimize: true,
-        minimizer: [new TerserPlugin()],
-    },
     mode: 'production'
 };
+
+// Minified configuration
+const minified = {
+    ...baseConfig,
+    output: {
+        filename: 'lu5-wasm.min.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin()]
+    }
+};
+
+const non_minified = {
+    ...baseConfig,
+    output: {
+        filename: 'lu5-wasm.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    optimization: {
+        minimize: false
+    }
+};
+
+module.exports = [non_minified, minified];

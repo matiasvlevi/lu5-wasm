@@ -1,7 +1,7 @@
-import { GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT, keyCodeToGlfwKey, toGlfwMods } from "../../glfw";
+import { get_cstr } from "../../memory";
+import * as glfw from "../../glfw";
 import { LU5 } from "../../lu5";
 import { type PlatformFunction } from "../../types";
-
 
 export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _title_ptr: number, mode: number): number {
     if (!this.wasm) return 0;
@@ -13,19 +13,22 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     const _lu5_mouse_cursor_callback = this.wasm.instance.exports._lu5_mouse_cursor_callback as PlatformFunction;
     const _lu5_mouse_button_callback = this.wasm.instance.exports._lu5_mouse_button_callback as PlatformFunction;
 
-    const window_title = this.get_cstr(_title_ptr);
-
     // Get or create
     let canvas = Array.from(document.querySelectorAll('canvas'))
-                      .filter(c => c.getAttribute('id') === window_title)[0];
+                      .filter(c => c.getAttribute('id') === this.canvas_id)[0];
     if (!canvas) {
         canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
     }
+
+    // Set canvas id if provided
+    if (this.canvas_id) 
+        canvas.setAttribute('id', this.canvas_id);
 
     // Set dimensions
     canvas.width = w;
     canvas.height = h;
-
+    
     // Bind Events
     document.addEventListener('wheel', (e) =>
         _lu5_mouse_scroll_callback(null,
@@ -36,19 +39,19 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     document.addEventListener('keydown', (e) => {
         _lu5_key_callback(
             null,
-            (keyCodeToGlfwKey[e.keyCode as never] || 0) as number,
+            (glfw.fromKeyCode[e.keyCode as never] || 0) as number,
             e.key,  // Use scan code to map with Name later in glfwGetKetName
-            e.repeat ? GLFW_REPEAT : GLFW_PRESS,
-            toGlfwMods(e)
+            e.repeat ? glfw.REPEAT : glfw.PRESS,
+            glfw.fromKeyboardEvent(e)
         )
     });
     document.addEventListener('keyup', (e) => {
         _lu5_key_callback(
             null,
-            (keyCodeToGlfwKey[e.keyCode as never] || 0) as number,
+            (glfw.fromKeyCode[e.keyCode as never] || 0) as number,
             e.key,  // Use scan code to map with Name later in glfwGetKetName
-            GLFW_RELEASE,
-            toGlfwMods(e)
+            glfw.RELEASE,
+            glfw.fromKeyboardEvent(e)
         )
     });
     canvas.addEventListener('mousemove', (e) => {
@@ -73,7 +76,6 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
         default: break;
     }
 
-    document.body.appendChild(canvas);
     return 0;
 }
 
@@ -176,8 +178,7 @@ export function lu5_render_quad_stroke(this: LU5, x1: number, y1: number, x2: nu
 export function lu5_render_text(this: LU5, text_ptr: number, x: number, y: number, fontSize: number, textAlign: number, _font: number, color: number) {
     if (!this.ctx) return;
 
-    const text = this.get_cstr(text_ptr);
-
+    const text = get_cstr(this.memory, text_ptr);
 
     switch (textAlign) {
         case 1: this.ctx.textAlign = "center"; break;

@@ -1,18 +1,17 @@
-import { lu5_bindings_expected, wasi_snapshot_preview1_expected } from "./expected";
+import { 
+    lu5_bindings_unimplemented, 
+    wasi_snapshot_preview1_unimplemented 
+} from "./unimplemented";
 import { type PlatformFunction } from "./types";
-
 
 import * as wasi_snapshot_preview1 from "./wasi";
 import * as bindings from './platform/index'
-
-declare global {
-    interface Window {
-        lu5: LU5;
-    }
-}
+import { write_cstr } from "./memory";
+import { colorToRGBA } from "./color";
 
 export class LU5 {
     readonly l5: number | null;
+    canvas_id: string | null;
     wasm: WebAssembly.WebAssemblyInstantiatedSource | null;
 
     ctx: CanvasRenderingContext2D | null;
@@ -29,10 +28,13 @@ export class LU5 {
     depth_mode: number;
     
     loop: boolean;
+    frame: () => any | undefined;
 
     env: Record<string, PlatformFunction>;
 
     constructor() {
+        this.canvas_id = null;
+
         this.l5 = null;
         this.wasm = null;
         this.ctx = null;
@@ -47,6 +49,7 @@ export class LU5 {
         this.mouseY = 0;
 
         this.loop = true;
+        this.frame = undefined;
 
         this.depth_mode = 0;
 
@@ -55,75 +58,10 @@ export class LU5 {
             saveSetjmp(_ptr: number) { return 0 },
             testSetjmp(_ptr: number, _v: number) { return 0 }
         }
+
     }
 
-    static makeEnv(bind: LU5, symbols: string[], implemented: Record<string, PlatformFunction>) {
-        
-        const env: Record<string, PlatformFunction> = {};
-        for (let sym of symbols) {
-            env[sym] = (implemented[sym] != undefined) ?
-                implemented[sym].bind(bind) :
-                (() => 0);
-        }
-        return env;
-    }
-
-    get_cstr(ptr: number, len?: number): string {
-        if (!this.memory) return '';
-        if (len !== undefined) {
-            let str_buffer = new Uint8Array(this.memory.buffer, ptr, len);
-            return new TextDecoder().decode(str_buffer);
-        }
-
-        // Null terminated
-        let str_buffer = new Uint8Array(this.memory.buffer, ptr, this.memory.buffer.byteLength - ptr);
-        return new TextDecoder().decode(
-            str_buffer.subarray(0, str_buffer.indexOf(0))
-        );
-    }
-
-    write_cstr(ptr: number, str_value: string): void {
-        if (!this.memory) return;
-        let encoder = new TextEncoder();
-        let encodedString = encoder.encode(str_value);
-        let i8 = new Uint8Array(this.memory.buffer);
-
-        if ((ptr + str_value.length) >= this.memory.buffer.byteLength) {
-            console.error('Memory overflow');
-            return;
-        }
-
-        i8.set(encodedString, ptr);
-    }
-
-    static bytesToNumber(bytes: Uint8Array): number {
-        let result = 0;
-        for (let x of bytes.reverse()) {
-            result = result * 0x100 + x;
-        }
-        return result;
-    }
-
-    deref(ptr: number, length: number): Uint8Array {
-        if (!this.memory) 
-            return new Uint8Array(0);
-        else 
-            return new Uint8Array(this.memory.buffer, ptr, length);
-    }
-
-    colorToRGBA(ptr: number) {
-        this.refreshMemory();
-        if (!this.view) return '#000';
-
-        const alpha = this.view.getUint8(ptr);
-        if (alpha == 0) return '#000';
-        return '#' +
-            this.view.getUint8(ptr + 3).toString(16).padStart(2)+
-            this.view.getUint8(ptr + 2).toString(16).padStart(2)+
-            this.view.getUint8(ptr + 1).toString(16).padStart(2)+
-            alpha.toString(16).padStart(2);
-        
-    }
+    colorToRGBA = colorToRGBA.bind(this);
 
     refreshMemory() {
         if (this.memory) if (this.view === null || this.view.buffer.byteLength === 0) {
@@ -131,109 +69,112 @@ export class LU5 {
         }
     }
 
-    setMemory(m: any) {
-        this.memory = m;
-    }
-
-    static async get_script_source(script: Element) {
-        let src = script.getAttribute('src');
-        if (src) {
-            return fetch(src).then(r => r.text());
-        } else {
-            return script.textContent;
+    static makeEnv(bind: LU5, symbols: string[], implemented: Record<string, PlatformFunction>) {
+        const env: Record<string, PlatformFunction> = {};
+        const syms = [...new Set([...symbols, ...Object.keys(implemented)])];
+        for (let sym of syms) {
+            env[sym] = (implemented[sym] == undefined) ?
+                (() => 0) :
+                implemented[sym].bind(bind) ;
         }
-    }
-
-    static get_scripts() {
-        const scripts = document.querySelectorAll('script[type="text/lua"]');
-
-        return Array.from(scripts).map(script => {
-            return {
-                src: script.getAttribute('src'),
-                canvas: script.getAttribute('canvas'),
-                content: LU5.get_script_source(script)
-            }
-        })
-    }
-
-    async get_script(): Promise<string> {
-        const scripts = LU5.get_scripts();
-        const content = await scripts[0].content;
-        return content ? new Promise((r) => r(content)) : '';
+        return env;
     }
 
     instantiate(lu5_wasm_path: string) {
         return WebAssembly.instantiateStreaming(fetch(lu5_wasm_path), {
             env: {
-                ...LU5.makeEnv(this, lu5_bindings_expected, bindings),
+                ...LU5.makeEnv(this, lu5_bindings_unimplemented, bindings),
                 ...this.env
             },
-            wasi_snapshot_preview1: LU5.makeEnv(this, wasi_snapshot_preview1_expected, wasi_snapshot_preview1)
+            wasi_snapshot_preview1: LU5.makeEnv(this, wasi_snapshot_preview1_unimplemented, wasi_snapshot_preview1)
         })
             .then((w) => {
                 this.wasm = w;
-                this.setMemory(w.instance.exports.memory);
-                return w;
+                this.memory = w.instance.exports.memory as WebAssembly.Memory;
+                return this;
             });
     }
 
-    vm(source: string): void {
+    #run(source: string, done: () => void = () => {}): void {
         if (this.wasm === null || !this.wasm.instance) {
-            console.warn('lu5 wasm hasn\'t loaded yet.')
+            console.warn('lu5 wasm hasn\'t loaded yet.');
             return;
         }
 
         const malloc = this.wasm.instance.exports.malloc as PlatformFunction;
+        const free = this.wasm.instance.exports.free as PlatformFunction;
+
         const _lu5_get_handle = this.wasm.instance.exports._lu5_get_handle as PlatformFunction;
+        const _lu5_init = this.wasm.instance.exports._lu5_init as PlatformFunction;
         const _lu5_setup = this.wasm.instance.exports._lu5_setup as PlatformFunction;
         const _lu5_frame = this.wasm.instance.exports._lu5_animation_frame as PlatformFunction;
 
-        Object.defineProperty(this, 'l5', {
-            writable: false,
-            value: _lu5_get_handle()
-        });
+        if (!this.l5) {
+            Object.defineProperty(this, 'l5', {
+                writable: false,
+                value: _lu5_get_handle()
+            });
 
+            // init when running for the first time
+            _lu5_init(this.l5);
+        }
+        
         // Allocate memory for lua source
         const source_ptr = malloc(source.length);
 
         // Set lua source in memory
-        this.write_cstr(source_ptr, source);
-        if (!this.l5) return;
+        write_cstr(this.memory, source_ptr, source);
+        if (!this.l5) {
+            free(source_ptr);
+            return;
+        };
 
         switch (_lu5_setup(this.l5, null, source_ptr)) {
             case 0:
                 let lastTime = 0;
                 // Single frame call
-                const frame = ((timestamp: number) => {
+                this.frame = ((timestamp: number) => {
                     const deltaTime = (timestamp - lastTime) / 1000;
 
                     _lu5_frame(this.l5, deltaTime);
 
                     lastTime = timestamp;
 
-                    if (this.loop)
-                        requestAnimationFrame(frame);
+                    if (this.loop) {
+                        requestAnimationFrame(this.frame);
+                    }
                 }).bind(this);
 
-                requestAnimationFrame(frame);
+                requestAnimationFrame(this.frame);
                 break;
             case 1:
             default:
-                this.reset();
+                free(source_ptr);
+                done();
                 return;
         }
     }
 
+    execute(source: string): Promise<LU5> {
+        return new Promise(res => {
+            this.#run(source, () => res(this));
+        })
+    }
+
     reset() {
-        if (!this.wasm) return;
+        if (!this.wasm) return this;
 
         const _lu5_close = this.wasm.instance.exports._lu5_close as PlatformFunction;
 
-        if (this.l5)
+        if (this.l5) {
             _lu5_close(this.l5);
+            Object.defineProperty(this, 'l5', { value: null, writable: false });
+        }
 
         if (this.ctx) {
             this.ctx.canvas.remove();
         }
+
+        return this;
     }
 }

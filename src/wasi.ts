@@ -1,8 +1,14 @@
 import { LU5 } from "./lu5";
 
-export function fd_write(this: LU5, fd: number, iovecs: number, iovec_len: number, nwritten: number) {
+export function fd_write(this: LU5, 
+    fd: number, 
+    iovecs: number, 
+    iovec_len: number, 
+    nwritten: number) 
+{
     if (!this.memory) return;
     
+    this.refreshMemory();
     const memory = this.memory.buffer;
 
     let totalBytesWritten = 0;
@@ -16,9 +22,9 @@ export function fd_write(this: LU5, fd: number, iovecs: number, iovec_len: numbe
             continue;
         }
 
-        const ptr = LU5.bytesToNumber(this.deref(iovec_ptr, 4));
-        const size = LU5.bytesToNumber(this.deref(iovec_ptr + 4, 4));
-
+        const ptr = this.view.getUint32(iovec_ptr, true);
+        const size = this.view.getUint32(iovec_ptr + 4, true);
+    
         if (ptr < 0 || (ptr + size) > memory.byteLength) {
             console.error(`fd_write: Data pointer (${ptr}) out of bounds or invalid size at iovec index ${i}`);
             continue;
@@ -27,7 +33,7 @@ export function fd_write(this: LU5, fd: number, iovecs: number, iovec_len: numbe
         if (size <= 0) continue;
 
         // Extract buffer data
-        const buffer = this.deref(ptr, size);
+        const buffer =  new Uint8Array(this.memory.buffer, ptr, size);
         buffers.push(buffer);
         totalBytesWritten += size;
     }
@@ -57,13 +63,20 @@ export function fd_write(this: LU5, fd: number, iovecs: number, iovec_len: numbe
     return writtenBytes;
 }
 
-export function clock_res_get(this: LU5, _clockId: number, resolution: number) {
+export function clock_res_get(this: LU5, 
+    _clockId: number, 
+    resolution: number) 
+{
     if (this.view)
         this.view.setBigUint64(resolution, 1000n, true);
     return 0;
 }
 
-export function clock_time_get(this: LU5, _clockId: number, _precision: number, time: number) {
+export function clock_time_get(this: LU5, 
+    _clockId: number, 
+    _precision: number, 
+    time: number) 
+{
     if (this.view)
         this.view.setBigUint64(time, BigInt(Date.now()) * 1_000_000n, true)
     return 0;
