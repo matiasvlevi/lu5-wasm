@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <!-- <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js"></script> -->
+        <script src="../dist/lu5-wasm.js"></script>
+
+        <script type="text/lua" canvas="mycanvas">
+            function setup()
+                createWindow(200, 200);
+                textAlign(CENTER);
+            end
+
+            function draw()
+                background('cyan');
+
+                textSize(14);
+                text('This canvas is inside a div', width/2, height/2);
+            end
+        </script>
+    </head>
+    <body>
+        <h1>Page</h1>
+        <div style="display: flex; gap: 2rem;">
+            <div>
+                <h3>Description</h3>
+                <p>Here, we injected the canvas in the right side div --></p>
+                
+            </div>
+            <canvas id="mycanvas"></canvas>
+        </div>
+    </body>
+</html>

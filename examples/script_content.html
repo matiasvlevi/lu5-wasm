@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <!-- <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js"></script> -->
+        <script src="../dist/lu5-wasm.js"></script>
+
+        <script type="text/lua">
+            function setup()
+                createWindow(400, 400);
+                textAlign(CENTER);
+            end
+
+            function draw()
+                background('pink');
+                text('This sketch is inside the html page', width/2, height/2);
+                text('Press Ctrl+U', width/2, height/2 + 26);
+            end
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

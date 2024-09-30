@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <!-- <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js" lib></script> -->
+        <script src="../dist/lu5-wasm.js" lib></script>
+        <script>
+            lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
+                .then(vm => vm.execute('print("Hello from lu5", "v" .. VERSION);'))
+                .then(vm => vm.execute('print()'))
+                .then(vm => vm.execute('print("Testing vm.reset:")'))
+                .then(vm => vm.execute('x = 32'))
+                .then(vm => vm.execute('y = 19'))
+                .then(vm => vm.execute('print(x, y)'))
+                .then(vm => vm.reset())                // Reset the memory
+                .then(vm => vm.execute('print(x, y)')) // Variables x, y were cleaned
+                .then(vm => vm.execute(sketch));       // Start some sketch
+
+            const sketch = `
+                function setup()
+                    createWindow(400, 400);
+                    textAlign(CENTER);
+                end
+
+                function draw()
+                    background('orange');
+                    textSize(22)
+                    text('This is a library usage example', width/2, height/2);
+
+                    textSize(16)
+                    text('Open the console', width/2, height/2 + 26);
+                end
+            `
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>

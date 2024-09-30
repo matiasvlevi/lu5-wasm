@@ -1,6 +1,6 @@
 # lu5-wasm
 
-A minimal javascript polyfill for the [lu5](https://github.com/matiasvlevi/lu5) interpreter when used in WebAssembly.
+A minimal WebAssembly instantiator & javascript polyfill for the [lu5](https://github.com/matiasvlevi/lu5) interpreter.
 
 <br/>
 
@@ -26,7 +26,27 @@ Add a script
 </script>
 ```
 
-Out of the box, `lu5-wasm` will search for lua or lu5 scripts and execute them. For now, it is only possible to have 1 canvas per page.
+Out of the box, `lu5-wasm` will search for and execute lu5 scripts in the document. Currently, only one canvas per page is supported.
+
+<br/>
+
+## Run in a specific canvas
+
+Add a canvas with an `id`
+
+The canvas can be placed anywhere in your document's body
+
+```html
+<canvas id="game"></canvas>
+```
+
+Include a lu5 script with a `canvas` attribute referencing the canvas `id`
+
+```html
+<script type="text/lua" src="sketch.lua" canvas="game"></script>
+```
+
+
 
 
 <br/>
@@ -65,7 +85,7 @@ lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
 
 <br/>
 
-You can use variables created from a previous execute calls
+You can use the state from previous execute calls
 
 ```js
 lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
@@ -74,7 +94,7 @@ lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
     .then(vm => vm.execute('print(x + y)'));
 ```
 
-Call `lu5.reset` to clear memory
+Call `lu5.reset` to clear state
 
 ```js
 lu5.init('https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm')
