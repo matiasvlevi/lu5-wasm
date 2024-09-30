@@ -37,8 +37,7 @@ Out of the box, `lu5-wasm` will search for lua or lu5 scripts and execute them. 
 ## Use `lu5-wasm` as a library
 
 For more specialized use cases, you may prefer to use `lu5-wasm` in library mode.
-
-This mode avoids looking for any lua scripts in the html document, instead, it exposes an api.
+This will disable the auto-execution of lua scripts in your document.
 
 Add the `lib` attribute to the script tag to enable library mode
 
