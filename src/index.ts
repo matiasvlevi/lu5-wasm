@@ -25,7 +25,7 @@ if (document.currentScript.hasAttribute('lib')) {
     window.onload = () => init();
 }
 
-export function init(wasm_bin_path: string = 'LU5_WASM_CDN'): Promise<void> 
+export function init(wasm_bin_path: string = `https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js`): Promise<void> 
 {
 
     // Check if library was included with a wasm attribute

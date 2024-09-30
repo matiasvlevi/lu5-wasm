@@ -1,6 +1,6 @@
 {
   "name": "lu5-wasm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/lu5-wasm.min.js",
   "scripts": {
     "build": "webpack --config webpack.config.js"
