@@ -6,15 +6,15 @@ This is a minimal JavaScript polyfill for the [lu5](https://github.com/matiasvle
 <br/>
 
 
-## Adding a lu5 canvas to your homepage
+## Getting Started
 
-Add the lu5 wasm runtime
+Add the `lu5-wasm` library from a CDN
 
 ```xml
 <script src="https://cdn.jsdelivr.net/gh/matiasvlevi/lu5-wasm@master/dist/lu5-wasm.min.js"></script>
 ```
 
-Create lua scripts
+Add a script
 
 ```xml
 <script type="text/lua">
@@ -28,13 +28,17 @@ Create lua scripts
 </script>
 ```
 
+Out of the box, `lu5-wasm` will search for lua or lu5 scripts and execute them. For now, it is only possible to have 1 canvas per page.
+
 
 <br/>
 <br/>
 
-## Include lu5-wasm as a library
+## Use `lu5-wasm` as a library
 
-Avoid looking for any lua scripts in the html document, instead, expose an api to call lu5 scripts.
+For more specialized use cases, you may prefer to use `lu5-wasm` in library mode.
+
+This mode avoids looking for any lua scripts in the html document, instead, it exposes an api.
 
 Add the `lib` attribute to the script tag to enable library mode
 
@@ -44,7 +48,7 @@ Add the `lib` attribute to the script tag to enable library mode
 
 <br/>
 
-Instantiate lu5 with the wasm binary and execute scripts.
+Instantiate `lu5` with the wasm binary and execute scripts.
 
 ```js
 lu5.init('./lu5.wasm')
@@ -62,7 +66,7 @@ lu5.init('./lu5.wasm')
 
 <br/>
 
-You can use variables created from a previous execute call.
+You can use variables created from a previous execute calls
 
 ```js
 lu5.init('./lu5.wasm')
@@ -71,8 +75,7 @@ lu5.init('./lu5.wasm')
     .then(vm => vm.execute('print(x + y)'));
 ```
 
-
-You can call `lu5.reset` to clear memory
+Call `lu5.reset` to clear memory
 
 ```js
 lu5.init('./lu5.wasm')
