@@ -1,9 +1,27 @@
 const lu5_bindings_unimplemented = [
+    // Image
     'lu5_image_crop',
-    'lu5_load_image',
-    'lu5_render_image',
-    'lu5_apply_color',
-    'lu5_glVertex2'
+    // 'lu5_load_image',
+    // 'lu5_render_image',
+
+    // 3D
+    'lu5_render_debug',
+    'lu5_render_box_faces',
+    'lu5_render_box_edges',
+    'lu5_render_cylinder_faces',
+    'lu5_render_cylinder_edges',
+    'lu5_render_torus_faces',
+    'lu5_render_torus_edges',
+    'lu5_render_plane_faces',
+    'lu5_render_plane_edges',
+    'lu5_render_ellipsoid_faces',
+    'lu5_render_ellipsoid_edges',
+
+    // Other
+    'lu5_glVertex2',
+    'lu5_init_freetype',
+    'lu5_close_fonts',
+    'lu5_load_default_font',
 ];
 
 const wasi_snapshot_preview1_unimplemented = [
