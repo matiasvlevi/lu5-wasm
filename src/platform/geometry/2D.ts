@@ -1,43 +1,42 @@
 import { get_cstr } from "../../memory";
 import * as glfw from "../../glfw";
 import { LU5 } from "../../lu5";
-import { type PlatformFunction } from "../../types";
 
 export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _title_ptr: number, mode: number): number {
     if (!this.wasm) return 0;
 
     this.depth_mode = mode;
-
-    const _lu5_mouse_scroll_callback = this.wasm.instance.exports._lu5_mouse_scroll_callback as PlatformFunction;
-    const _lu5_key_callback          = this.wasm.instance.exports._lu5_key_callback          as PlatformFunction;
-    const _lu5_mouse_cursor_callback = this.wasm.instance.exports._lu5_mouse_cursor_callback as PlatformFunction;
-    const _lu5_mouse_button_callback = this.wasm.instance.exports._lu5_mouse_button_callback as PlatformFunction;
+    if (mode == 1) {
+        console.warn('3D Mode is not supported in lu5-wasm yet.');
+        return 0;
+    }
 
     // Get or create
     let canvas = Array.from(document.querySelectorAll('canvas'))
-                      .filter(c => c.getAttribute('id') === this.canvas_id)[0];
+        .filter(c => c.getAttribute('id') === this.canvas_id)[0];
     if (!canvas) {
         canvas = document.createElement('canvas');
         document.body.appendChild(canvas);
     }
 
     // Set canvas id if provided
-    if (this.canvas_id) 
+    if (this.canvas_id)
         canvas.setAttribute('id', this.canvas_id);
 
     // Set dimensions
     canvas.width = w;
     canvas.height = h;
-    
+    canvas.style.display = 'block';
+
     // Bind Events
     document.addEventListener('wheel', (e) =>
-        _lu5_mouse_scroll_callback(null,
+        this.wasm.instance.exports._lu5_mouse_scroll_callback(null,
             (e.deltaX > 0) ? 1 : -1,
             (e.deltaY > 0) ? 1 : -1
         )
     );
     document.addEventListener('keydown', (e) => {
-        _lu5_key_callback(
+        this.wasm.instance.exports._lu5_key_callback(
             null,
             (glfw.fromKeyCode[e.keyCode as never] || 0) as number,
             e.key,  // Use scan code to map with Name later in glfwGetKetName
@@ -46,7 +45,7 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
         )
     });
     document.addEventListener('keyup', (e) => {
-        _lu5_key_callback(
+        this.wasm.instance.exports._lu5_key_callback(
             null,
             (glfw.fromKeyCode[e.keyCode as never] || 0) as number,
             e.key,  // Use scan code to map with Name later in glfwGetKetName
@@ -60,14 +59,14 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
         this.mouseX = e.clientX - rect.left;
         this.mouseY = e.clientY - rect.top;
 
-        _lu5_mouse_cursor_callback(null, this.mouseX, this.mouseY);
+        this.wasm.instance.exports._lu5_mouse_cursor_callback(null, this.mouseX, this.mouseY);
     });
     canvas.addEventListener('mousedown', (e) =>
-        _lu5_mouse_button_callback(null, e.button, 1, 0)
+        this.wasm.instance.exports._lu5_mouse_button_callback(null, e.button, 1, 0)
     );
     canvas.addEventListener('mouseup', (e) =>
-        _lu5_mouse_button_callback(null, e.button, 0, 0)
-    ); 
+        this.wasm.instance.exports._lu5_mouse_button_callback(null, e.button, 0, 0)
+    );
 
     // Set rendering context
     switch (mode) {
@@ -119,6 +118,15 @@ export function lu5_render_ellipse(this: LU5, x: number, y: number, w: number, h
     this.ctx.beginPath();
     this.ctx.ellipse(x, y, w, h, 0, 0, 2 * Math.PI);
     this.ctx.fill();
+}
+
+export function lu5_render_triangle_fill(this: LU5,
+    x1: number, y1: number,
+    x2: number, y2: number,
+    x3: number, y3: number,
+    color: number
+) {
+    return 0;
 }
 
 export function lu5_render_ring(this: LU5, x: number, y: number, inner_radius_h: number, inner_radius_w: number, strokeWeight: number, _segments: number, color: number) {
