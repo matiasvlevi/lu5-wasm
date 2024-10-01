@@ -9,7 +9,6 @@ export function lu5_load_image(this:LU5, _L:number, path_str: number) {
     // Add image
     const img = new Image();
     img.src = path;
-    console.log(img.width, img.height)
     images.push(img);
 
     // Return an image struct, with an image index as texture ptr
@@ -30,5 +29,5 @@ export function lu5_render_image(this:LU5, _L:number, image_ptr:number, x:number
     const img = images[image_index];
     if (!img.complete) return;
 
-    this.ctx.drawImage(img, 0, 0, img.width, img.height, x, y, w, h);
+    this.ctx.drawImage(img, x, y, w, h);
 }

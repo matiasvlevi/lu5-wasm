@@ -26,7 +26,6 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     // Set dimensions
     canvas.width = w;
     canvas.height = h;
-    canvas.style.display = 'block';
 
     // Bind Events
     document.addEventListener('wheel', (e) =>
