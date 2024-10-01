@@ -2,7 +2,7 @@ import {
     lu5_bindings_unimplemented, 
     wasi_snapshot_preview1_unimplemented 
 } from "./unimplemented";
-import { type PlatformFunction } from "./types";
+import { WebAssemblyInstance, type PlatformFunction } from "./types";
 
 import * as wasi_snapshot_preview1 from "./wasi";
 import * as bindings from './platform/index'
@@ -12,7 +12,7 @@ import { colorToRGBA } from "./color";
 export class LU5 {
     readonly l5: number | null;
     canvas_id: string | null;
-    wasm: WebAssembly.WebAssemblyInstantiatedSource | null;
+    wasm: WebAssemblyInstance | null;
 
     ctx: CanvasRenderingContext2D | null;
     gl: WebGLRenderingContext | null;
@@ -88,7 +88,7 @@ export class LU5 {
             },
             wasi_snapshot_preview1: LU5.makeEnv(this, wasi_snapshot_preview1_unimplemented, wasi_snapshot_preview1)
         })
-            .then((w) => {
+            .then((w: WebAssemblyInstance) => {
                 this.wasm = w;
                 this.memory = w.instance.exports.memory as WebAssembly.Memory;
                 return this;
@@ -101,42 +101,34 @@ export class LU5 {
             return;
         }
 
-        const malloc = this.wasm.instance.exports.malloc as PlatformFunction;
-        const free = this.wasm.instance.exports.free as PlatformFunction;
-
-        const _lu5_get_handle = this.wasm.instance.exports._lu5_get_handle as PlatformFunction;
-        const _lu5_init = this.wasm.instance.exports._lu5_init as PlatformFunction;
-        const _lu5_setup = this.wasm.instance.exports._lu5_setup as PlatformFunction;
-        const _lu5_frame = this.wasm.instance.exports._lu5_animation_frame as PlatformFunction;
-
         if (!this.l5) {
             Object.defineProperty(this, 'l5', {
                 writable: false,
-                value: _lu5_get_handle()
+                value: this.wasm.instance.exports._lu5_get_handle()
             });
 
             // init when running for the first time
-            _lu5_init(this.l5);
+            this.wasm.instance.exports._lu5_init(this.l5);
         }
         
         // Allocate memory for lua source
-        const source_ptr = malloc(source.length);
+        const source_ptr = this.wasm.instance.exports.malloc(source.length);
 
         // Set lua source in memory
         write_cstr(this.memory, source_ptr, source);
         if (!this.l5) {
-            free(source_ptr);
+            this.wasm.instance.exports.free(source_ptr);
             return;
         };
 
-        switch (_lu5_setup(this.l5, null, source_ptr)) {
+        switch (this.wasm.instance.exports._lu5_setup(this.l5, null, source_ptr)) {
             case 0:
                 let lastTime = 0;
                 // Single frame call
                 this.frame = ((timestamp: number) => {
                     const deltaTime = (timestamp - lastTime) / 1000;
 
-                    _lu5_frame(this.l5, deltaTime);
+                    this.wasm.instance.exports._lu5_animation_frame(this.l5, deltaTime);
 
                     lastTime = timestamp;
 
@@ -149,7 +141,7 @@ export class LU5 {
                 break;
             case 1:
             default:
-                free(source_ptr);
+                this.wasm.instance.exports.free(source_ptr);
                 done();
                 return;
         }
@@ -164,10 +156,8 @@ export class LU5 {
     reset() {
         if (!this.wasm) return this;
 
-        const _lu5_close = this.wasm.instance.exports._lu5_close as PlatformFunction;
-
         if (this.l5) {
-            _lu5_close(this.l5);
+            this.wasm.instance.exports._lu5_close(this.l5);
             Object.defineProperty(this, 'l5', { value: null, writable: false });
         }
 
