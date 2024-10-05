@@ -95,6 +95,12 @@ export class LU5 {
             });
     }
 
+    async setCanvas(id?:string) {
+        this.canvas_id = id || undefined;
+        
+        return this;
+    }
+
     #run(source: string, done: () => void = () => {}): void {
         if (this.wasm === null || !this.wasm.instance) {
             console.warn('lu5 wasm hasn\'t loaded yet.');
