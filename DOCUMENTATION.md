@@ -31,6 +31,54 @@ lu5.init('/path/to/my/build/lu5.wasm')
 
 <br/><br/>
 
+# `lu5.compile([path])`
+
+Compiles the WebAssembly Module for later use.
+
+### Arguments
+
+* **[path]** `string` WebAssembly binary path, by default, the official lu5 cdn is used to serve `lu5.wasm`
+
+### Returns
+
+A promise which passes the WebAssembly Module
+
+### Examples
+
+```js
+lu5.compile('path/to/my/lu5.wasm')
+   .then(module => console.log(module))
+```
+
+<br/><br/>
+
+
+# `lu5.instantiate(module)`
+
+Instantiates the lu5 WebAssembly instance
+
+### Arguments
+
+* **module** WebAssembly module, previously loaded with `lu5.compile`
+
+### Returns
+
+A promise which passes a lu5 instance.
+
+### Examples
+
+You need to compile first
+
+```js
+const module = await lu5.compile('path/to/my/lu5.wasm')
+
+lu5.instantiate(module)
+    .then(vm => vm.execute('print("Hello from lu5")'))
+```
+
+<br/><br/>
+
+
 # `vm.execute(code)`
 
 Evaluate and run a lua script string.

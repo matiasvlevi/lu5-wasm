@@ -8,7 +8,7 @@ A minimal WebAssembly instantiator & javascript polyfill for the [lu5](https://g
 
 Add the `lu5-wasm` library from a CDN
 
-```htm
+```html
 <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js"></script>
 ```
 
@@ -26,7 +26,7 @@ Add a script
 </script>
 ```
 
-Out of the box, `lu5-wasm` will search for and execute lu5 scripts in the document. Currently, only one canvas per page is supported.
+Out of the box, `lu5-wasm` will search for and execute lu5 scripts in the document.
 
 <br/>
 
@@ -59,7 +59,7 @@ This will disable the auto-execution of lua scripts in your document.
 
 Add the `lib` attribute to the script tag to enable library mode
 
-```htm
+```html
 <script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js" lib></script>
 ```
 
@@ -102,3 +102,5 @@ lu5.init()
     .then(vm => vm.reset())
     .then(vm => vm.execute('print(x)')); // nil
 ```
+
+See [DOCUMENTATION.md](DOCUMENTATION.md).
