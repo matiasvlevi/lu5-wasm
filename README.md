@@ -4,6 +4,18 @@ A minimal WebAssembly instantiator & javascript polyfill for the [lu5](https://g
 
 <br/>
 
+## Current Limitations
+
+
+* No async 
+* No file i/o
+* No matrix transform stack (`translate`, `rotate`, `scale`)
+* No 3D Rendering
+* No setjmp & longjmps
+* No exception handling (we currently use a workaround)
+
+<br/>
+
 ## Getting Started
 
 Add the `lu5-wasm` library from a CDN
@@ -45,9 +57,6 @@ Include a lu5 script with a `canvas` attribute referencing the canvas `id`
 ```html
 <script type="text/lua" src="sketch.lua" canvas="game"></script>
 ```
-
-
-
 
 <br/>
 <br/>
@@ -104,3 +113,8 @@ lu5.init()
 ```
 
 See [DOCUMENTATION.md](DOCUMENTATION.md).
+
+
+
+<br/><br/>
+
