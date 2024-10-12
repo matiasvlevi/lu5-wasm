@@ -27,7 +27,7 @@ export function write_cstr(mem: WebAssembly.Memory, ptr: number, str_value: stri
 
     // Check for buffer overflow
     if ((ptr + nullTerminatedString.length) >= mem.buffer.byteLength) {
-        console.error('Memory overflow');
+        this.error('write_cstr Memory overflow');
         return;
     }
 

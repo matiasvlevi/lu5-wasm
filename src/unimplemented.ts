@@ -17,6 +17,11 @@ const lu5_bindings_unimplemented = [
     'lu5_render_ellipsoid_faces',
     'lu5_render_ellipsoid_edges',
 
+    // GLFW
+    'lu5_swapBuffers',
+    'lu5_pollEvents',
+    'lu5_setWindowShouldClose',
+
     // Other
     'lu5_glVertex2',
     'lu5_init_freetype',
@@ -25,6 +30,8 @@ const lu5_bindings_unimplemented = [
 ];
 
 const wasi_snapshot_preview1_unimplemented = [
+    
+    'random_get',
     'args_get',
     'args_sizes_get',
     'environ_get',

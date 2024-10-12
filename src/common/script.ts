@@ -1,3 +1,5 @@
+
+
 async function get_script_source(script: Element): Promise<string> {
     let src = script.getAttribute('src');
     return (src) ?

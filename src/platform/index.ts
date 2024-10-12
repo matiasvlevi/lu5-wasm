@@ -1,53 +1,54 @@
-import { get_cstr } from "../memory";
-import { LU5 } from "../lu5";
+import { LU5 } from '../lu5'
+import { write_cstr } from '../memory'
 
 export * from './geometry/2D'
 export * from './image'
+export * from './font'
+export * from './fs'
+export * from './window'
 
-export function lu5_noLoop(this: LU5) {
-    this.loop = false;
-}
+import * as glfw from '../glfw'
 
-export function lu5_loop(this: LU5) {
-    if (!this.loop) {
-        requestAnimationFrame(this.frame);
+// create a map
+
+
+
+export function lu5_GetKeyName(this:LU5, key: number, scancode: number) {
+
+    if (this.keyname_ptr == null) {
+        this.calls.free(this.keyname_ptr);
+    }
+    
+    let name: string|null = null;
+
+    // check if alphanumeric and return the character
+    if (key >= 65 && key <= 90) {
+        name = String.fromCharCode(key);
     }
 
-    this.loop = true;
-}
-
-export function lu5_getCursorPos(this: LU5, _window: number, mousex_ptr: number, mousey_ptr: number) {
-    this.refreshMemory();
-
-    if (this.view) {
-        this.view.setFloat64(mousex_ptr, this.mouseX, true);
-        this.view.setFloat64(mousey_ptr, this.mouseY, true);
+    // Numbers
+    if (key >= 48 && key <= 57) {
+        name = String.fromCharCode(key);
     }
-    return 0;
+
+    // Numpad
+    if (key >= 320 && key <= 329) {
+        name = 'Numpad ' + (key - 320);
+    }
+
+    // Function keys
+    if (key >= 290 && key <= 299) {
+        name = 'F' + (key - 290 + 1);
+    }
+
+    if (name === null) {
+        this.keyname_ptr = null;
+        return this.keyname_ptr;
+    };
+
+    
+    this.keyname_ptr = this.calls.malloc(name.length);
+    write_cstr(this.memory, this.keyname_ptr, name);
+
+    return this.keyname_ptr;
 }
-
-export async function lu5_read_file(this: LU5, file_path_ptr: number, file_size_ptr: number, err_ptr: number) {
-    console.warn('File I/O is not supported in lu5-wasm yet');
-    return 0;
-}
-
-export function lu5_write_file() {
-    console.warn('File I/O is not supported in lu5-wasm yet');
-    return 0;
-}
-
-export function lu5_load_and_add_font(this: LU5, _lu5: number, _font_ptrptr: number, name_ptr: number) {
-    console.warn(`'lu5_load_and_add_font' is not yet implemented...`);
-}
-
-export function lu5_set_font(this: LU5, fontname_ptr: number) {
-    const name = get_cstr(this.memory, fontname_ptr);
-    console.warn(`Trying to set font ${name} but 'lu5_set_font' is not yet implemented...`);
-
-    return 0;
-}
-
-export function lu5_time_seed() {
-    return Math.floor(Math.random() * 1000000);
-}
-
