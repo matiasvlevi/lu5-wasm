@@ -21,7 +21,7 @@ Object.defineProperty(window, '_lu5_instantiate_script', {
     writable: false
 });
 
-const DEV = true;
+const DEV = false;
 const LU5_WASM_CDN = DEV ? '../dist/lu5.wasm' : `https://unpkg.com/lu5-wasm@latest/dist/lu5.wasm`;
 
 window._get_or_create_by_id = get_or_create_by_id

@@ -21,6 +21,8 @@ const lu5_bindings_unimplemented = [
     'lu5_swapBuffers',
     'lu5_pollEvents',
     'lu5_setWindowShouldClose',
+    'lu5_PushMatrix',
+    'lu5_PopMatrix',
 
     // Other
     'lu5_glVertex2',
