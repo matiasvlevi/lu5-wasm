@@ -6,11 +6,11 @@ import { WebAssemblyInstance, type PlatformFunction } from "./types";
 
 import * as wasi_snapshot_preview1 from "./wasi";
 import * as bindings from './platform/index'
-import { get_cstr, write_cstr } from "./memory";
+import { write_cstr } from "./memory";
 import { colorToHex, colorToRGBA } from "./color";
 import { LU5Console } from "./console"
 
-import * as glfw from './glfw'
+import * as glfw from './keyboard'
 
 export class LU5 {
     readonly l5: number | null;
@@ -44,6 +44,8 @@ export class LU5 {
 
     events: Record<string, any>;
 
+    _af_id: number;
+
     constructor() {
         this.wasm;
         this.canvas_id = 'lu5-canvas';
@@ -69,6 +71,8 @@ export class LU5 {
         this.depth_mode = 0;
 
         this.events = {};
+
+        this._af_id = 0;
     }
 
     colorToHex = colorToHex.bind(this);
@@ -91,7 +95,7 @@ export class LU5 {
         if (!msg.includes(LU5.err_prefix)) msg = `${LU5.err_prefix} ${msg}`;
 
         // Write error
-        this.write(2, 'error', msg); 
+        this.write(2, 'error', msg);
     }
     log(msg: string) { this.write(1, 'log', msg) }
     warn(msg: string) { this.write(1, 'warn', msg) }
@@ -158,12 +162,12 @@ export class LU5 {
         saveSetjmp() {
             // // TODO: Figure this out to catch exceptions
             // console.log('saveSetjmp',...arguments);
-            return 0 
+            return 0
         },
         testSetjmp() {
             // // TODO: Figure this out to catch exceptions
             // console.log('testSetjmp', ...arguments);
-            return 0 
+            return 0
         }
     }
 
@@ -232,8 +236,6 @@ export class LU5 {
 
         return this;
     }
-
-
 
     handleWheel(e: WheelEvent) {
         if (!this.wasm) return;
@@ -308,7 +310,7 @@ export class LU5 {
         }
 
         // Allocate memory for lua source
-        const source_ptr = this.calls.malloc(source.length);
+        const source_ptr = this.calls.malloc(source.length + 1);
 
         // Set lua source in memory
         write_cstr(this.memory, source_ptr, source);
@@ -321,32 +323,37 @@ export class LU5 {
         switch (this.calls._lu5_setup(this.l5, null, source_ptr)) {
             case 0:
                 const target_fps = this.view.getInt32(this.l5 + 8, true);
-   
                 let elapsed = 0;
-                let fpsInterval = 1000.0 / target_fps;
+                let fpsInterval = 1000 / (target_fps);
+                let now = window.performance.now();
+                let then_real = window.performance.now();
                 let then = window.performance.now();
 
                 // Single frame call
-                this.frame = (function(this:LU5, now: number) {
-                    if (!this.loop) return;
-
-                    requestAnimationFrame(this.frame);
-
+                this.frame = (function (this: LU5, timestamp: number) {
+                    now = timestamp || window.performance.now();
                     elapsed = now - then;
+                    fpsInterval = 1000 / target_fps;
+                    
+                    const epsilon = 5;
+                    if (!this.loop || elapsed > fpsInterval-epsilon) {
 
-                    if (target_fps == -1) {
-                        then = now;
+                        const deltaTime = now - then_real;
 
-                        this.calls._lu5_animation_frame(this.l5, elapsed);
-
-                    } else if (elapsed >= fpsInterval) {
-                        then = now;
-
-                        this.calls._lu5_animation_frame(this.l5, elapsed);
+                        // Call Draw
+                        this.calls._lu5_animation_frame(this.l5, deltaTime / 1000);
+                        
+                        then = Math.max(then + elapsed, now);
+                        then_real = now;
                     }
+
+                    if (this.loop) {
+                        this._af_id = requestAnimationFrame(this.frame);
+                    }
+
                 }).bind(this);
 
-                requestAnimationFrame(this.frame);
+                this._af_id = requestAnimationFrame(this.frame);
                 break;
             case undefined: case 1: default:
                 this.calls.free(source_ptr);
@@ -357,6 +364,8 @@ export class LU5 {
 
     async reset() {
         this.loop = false;
+
+        window.cancelAnimationFrame(this._af_id);
 
         await new Promise(r => setTimeout(() => {
             if (!this.wasm) {
