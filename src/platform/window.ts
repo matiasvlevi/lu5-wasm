@@ -15,9 +15,16 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     const canvas = get_or_create_by_id('canvas', this.canvas_id) as HTMLCanvasElement;
     canvas.style.display = 'inline';
 
+    if (w == 0 && h == 0) {
+        w = innerWidth;
+        h = innerHeight;
+    }
+
     // Set dimensions
     canvas.width = w;
     canvas.height = h;
+    console.log(this.calls, this);
+    this.calls._lu5_update_window_size(this.l5, w, h);
 
     // Set rendering context
     switch (mode) {
