@@ -128,21 +128,24 @@ export function lu5_render_text(this: LU5,
     this.ctx.fillText(text, x, y - 4);
 }
 
-export function lu5_render_triangle_fill(this: LU5,
+export function lu5_render_triangle(this: LU5,
     x1: number, y1: number,
     x2: number, y2: number,
     x3: number, y3: number,
-    color: number) {
+    strokeWeight: number,
+    fill: number,
+    stroke: number) {
     if (!this.ctx) return;
 
+    this.ctx.lineWidth = strokeWeight;
+    this.ctx.lineJoin = 'round';
+    this.ctx.fillStyle = this.colorToHex(fill);
+    this.ctx.strokeStyle = this.colorToHex(stroke);
+
     this.ctx.beginPath();
-
-    this.ctx.fillStyle = this.colorToHex(color);
-
     this.ctx.moveTo(x1, y1);
     this.ctx.lineTo(x2, y2);
     this.ctx.lineTo(x3, y3);
-
     this.ctx.closePath();
     this.ctx.fill();
     this.ctx.stroke();
