@@ -48,8 +48,7 @@ export function lu5_render_line(this: LU5,
     this.ctx.stroke();
 }
 
-
-export function lu5_render_ellipse_w_stroke(this: LU5,
+export function lu5_render_ellipse(this: LU5,
     x: number, y: number,
     h: number, w: number,
     strokeWeight: number,
@@ -68,11 +67,12 @@ export function lu5_render_ellipse_w_stroke(this: LU5,
     this.ctx.fill();
 }
 
-export function lu5_render_ellipse(this: LU5,
+export function lu5_render_ellipse_fill(this: LU5,
     x: number, y: number,
     w: number, h: number,
     color: number,
-    _segments: number) {
+    _segments: number) 
+{
     if (!this.ctx) return;
 
     this.ctx.fillStyle = this.colorToHex(color);
@@ -82,81 +82,28 @@ export function lu5_render_ellipse(this: LU5,
     this.ctx.fill();
 }
 
-export function lu5_render_arc_fill(this: LU5,
+export function lu5_render_arc(this: LU5,
     x: number, y: number,
     rx: number, ry: number,
+    strokeWeight: number,
     start_angle: number, end_angle: number,
     _segments: number,
-    color: number) {
+    fill: number,
+    stroke: number) {
     if (!this.ctx) return;
-    this.ctx.fillStyle = this.colorToHex(color);
+
+    this.ctx.fillStyle = this.colorToHex(fill);
+    this.ctx.strokeStyle = this.colorToHex(stroke);
+    this.ctx.lineWidth = strokeWeight;
+
     this.ctx.beginPath();
     this.ctx.ellipse(x, y, rx, ry, 0, start_angle, end_angle);
+    this.ctx.stroke();
+    
     this.ctx.lineTo(x, y);
     this.ctx.closePath();
+
     this.ctx.fill();
-}
-
-export function lu5_render_arc_stroke(this: LU5,
-    x: number, y: number,
-    w: number, h: number,
-    strokeWeight: number,
-    start_angle: number,
-    end_angle: number,
-    _segments: number,
-    color: number) {
-    if (!this.ctx) return;
-
-    this.ctx.strokeStyle = this.colorToHex(color);
-
-    this.ctx.beginPath();
-
-    this.ctx.ellipse(x, y, w, h, 0, start_angle, end_angle);
-    this.ctx.lineWidth = strokeWeight;
-
-    this.ctx.stroke();
-}
-
-export function lu5_render_quad_fill(this: LU5,
-    x1: number, y1: number,
-    x2: number, y2: number,
-    x3: number, y3: number,
-    x4: number, y4: number,
-    color: number) {
-    if (!this.ctx) return;
-
-    this.ctx.fillStyle = this.colorToHex(color);
-
-    this.ctx.beginPath();
-
-    this.ctx.moveTo(x1, y1);
-    this.ctx.lineTo(x2, y2);
-    this.ctx.lineTo(x3, y3);
-    this.ctx.lineTo(x4, y4);
-
-    this.ctx.closePath();
-    this.ctx.fill();
-}
-
-export function lu5_render_quad_stroke(this: LU5,
-    x1: number, y1: number,
-    x2: number, y2: number,
-    x3: number, y3: number,
-    x4: number, y4: number,
-    strokeWeight: number,
-    color: number) {
-    if (!this.ctx) return;
-
-    this.ctx.strokeStyle = this.colorToHex(color);
-
-    const px = Math.min(x1, x2, x3, x4);
-    const py = Math.min(y1, y2, y3, y4);
-
-    const w = Math.max(x1, x2, x3, x4) - px;
-    const h = Math.max(y1, y2, y3, y4) - py;
-
-    this.ctx.lineWidth = strokeWeight;
-    this.ctx.strokeRect(px, py, w, h);
 }
 
 export function lu5_render_text(this: LU5,
