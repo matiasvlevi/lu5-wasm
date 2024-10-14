@@ -267,24 +267,44 @@ export class LU5 {
         )
     }
 
-    handleMousemove(e: MouseEvent) {
+    handleMousemove(e: MouseEvent|TouchEvent) {
         if (!this.wasm) return;
         const rect = this.ctx.canvas.getBoundingClientRect();
 
-        this.mouseX = Math.round(e.clientX - rect.left);
-        this.mouseY = Math.round(e.clientY - rect.top);
+        if (e instanceof MouseEvent) {
+            this.mouseX = Math.round(e.clientX - rect.left);
+            this.mouseY = Math.round(e.clientY - rect.top);
+        } else {
+            this.mouseX = Math.round(e.changedTouches[0].clientX - rect.left);
+            this.mouseY = Math.round(e.changedTouches[0].clientY - rect.top);    
+        }
 
         this.calls._lu5_mouse_cursor_callback(null, this.mouseX, this.mouseY);
     }
 
-    handleMousedown(e: MouseEvent) {
+    handleMousedown(e: MouseEvent|TouchEvent) {
         if (!this.wasm) return;
-        this.calls._lu5_mouse_button_callback(null, e.button, 1, 0)
+
+        if (e instanceof TouchEvent) {
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            console.log(e);
+            this.mouseX = Math.round(e.changedTouches[0].clientX - rect.left);
+            this.mouseY = Math.round(e.changedTouches[0].clientY - rect.top); 
+        }
+        
+        this.calls._lu5_mouse_button_callback(null, e instanceof MouseEvent ? e.button : 0, 1, 0)
     }
 
-    handleMouseup(e: MouseEvent) {
+    handleMouseup(e: MouseEvent|TouchEvent) {
         if (!this.wasm) return;
-        this.calls._lu5_mouse_button_callback(null, e.button, 0, 0)
+
+        if (e instanceof TouchEvent) {
+            const rect = this.ctx.canvas.getBoundingClientRect();
+            this.mouseX = Math.round(e.changedTouches[0].clientX - rect.left);
+            this.mouseY = Math.round(e.changedTouches[0].clientY - rect.top); 
+        }
+
+        this.calls._lu5_mouse_button_callback(null, e instanceof MouseEvent ? e.button : 0, 0, 0);
     }
 
     execute(source: string): Promise<LU5> {

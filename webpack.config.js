@@ -20,7 +20,6 @@ const baseConfig = {
         ],
     },
     plugins: [
-        // This will make foobar available globally, so secondary can use it
         new webpack.ProvidePlugin({
           'get_or_create_by_id': path.resolve(__dirname, 'src/common/dom.ts'),
         }),
