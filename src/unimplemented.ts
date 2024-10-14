@@ -1,8 +1,6 @@
 const lu5_bindings_unimplemented = [
     // Image
     'lu5_image_crop',
-    // 'lu5_load_image',
-    // 'lu5_render_image',
 
     // 3D
     'lu5_render_debug',
@@ -32,7 +30,6 @@ const lu5_bindings_unimplemented = [
 ];
 
 const wasi_snapshot_preview1_unimplemented = [
-    
     'random_get',
     'args_get',
     'args_sizes_get',
