@@ -1,4 +1,4 @@
-import { get_or_create_by_id } from "../common/dom";
+import { get_or_create_by_id, is_mobile } from "../common/dom";
 import { LU5 } from "../lu5";
 
 export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _title_ptr: number, mode: number): number 
@@ -36,9 +36,15 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     this.events['handleKeyup'] = this.handleKeyup.bind(this);
     document.addEventListener('keyup', this.events['handleKeyup']);
     
-    canvas.addEventListener('mousemove', this.handleMousemove.bind(this));
-    canvas.addEventListener('mousedown', this.handleMousedown.bind(this));
-    canvas.addEventListener('mouseup', this.handleMouseup.bind(this));
+    this.events['handleMousemove'] = this.handleMousemove.bind(this);
+    this.events['handleMousedown'] = this.handleMousedown.bind(this);
+    this.events['handleMouseup'] = this.handleMouseup.bind(this);
+
+    const mobile = is_mobile();
+    
+    canvas.addEventListener(mobile ? 'touchmove' : 'mousemove', this.events['handleMousemove']);
+    canvas.addEventListener(mobile ? 'touchstart' : 'mousedown', this.events['handleMousedown']);
+    canvas.addEventListener(mobile ? 'touchend' : 'mouseup', this.events['handleMouseup']);
 
     return 0;
 }
