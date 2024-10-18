@@ -12,16 +12,16 @@ export function get_cstr(mem: WebAssembly.Memory, ptr: number, len?: number): st
     );
 }
 
-export function write_cstr(mem: WebAssembly.Memory, ptr: number, str_value: string): void {
+export function write_cstr(mem: WebAssembly.Memory, ptr: number, str_value: string, len:number = -1): number {
     if (!mem) return;
     
     let encoder = new TextEncoder();
     let encodedString = encoder.encode(str_value);
 
     // Add null terminator
-    let nullTerminatedString = new Uint8Array(encodedString.length + 1);
+    let nullTerminatedString = new Uint8Array(encodedString.length + ((len === -1) ? 1 : 0));
     nullTerminatedString.set(encodedString);
-    nullTerminatedString[encodedString.length] = 0;  // null terminator
+    if (len === -1) nullTerminatedString[encodedString.length] = 0;  // null terminator
 
     let i8 = new Uint8Array(mem.buffer);
 
@@ -32,4 +32,6 @@ export function write_cstr(mem: WebAssembly.Memory, ptr: number, str_value: stri
     }
 
     i8.set(nullTerminatedString, ptr);
+
+    return ptr;
 }

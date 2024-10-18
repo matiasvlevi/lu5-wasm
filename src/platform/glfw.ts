@@ -1,7 +1,7 @@
 import { LU5 } from "../lu5";
 import { write_cstr } from "../memory";
 
-export function lu5_GetKeyName(this:LU5, key: number, _scancode: number) 
+export function lu5_GetKeyName(this:LU5, key: number, _scancode: number): number
 {
     if (this.keyname_ptr == null) {
         this.calls.free(this.keyname_ptr);
@@ -36,7 +36,6 @@ export function lu5_GetKeyName(this:LU5, key: number, _scancode: number)
 
     
     this.keyname_ptr = this.calls.malloc(name.length);
-    write_cstr(this.memory, this.keyname_ptr, name);
-
-    return this.keyname_ptr;
+    
+    return write_cstr(this.memory, this.keyname_ptr, name);
 }
