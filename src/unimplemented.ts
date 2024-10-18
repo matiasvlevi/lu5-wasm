@@ -1,3 +1,6 @@
+import { LU5 } from "./lu5";
+import { PlatformFunction } from "./types";
+
 const lu5_bindings_unimplemented = [
     // Image
     'lu5_image_crop',
@@ -88,4 +91,13 @@ const wasi_snapshot_preview1_unimplemented = [
     'sock_send',
 ];
 
-export { lu5_bindings_unimplemented, wasi_snapshot_preview1_unimplemented };
+function makeEnv(bind: LU5, symbols: string[], implemented: Record<string, PlatformFunction>) {
+    const env: Record<string, PlatformFunction> = {};
+    const syms = [...new Set([...symbols, ...Object.keys(implemented)])];
+    for (let sym of syms) {
+        env[sym] = (implemented[sym] == undefined) ? (() => 0) : implemented[sym].bind(bind);
+    }
+    return env;
+}
+
+export { lu5_bindings_unimplemented, wasi_snapshot_preview1_unimplemented, makeEnv };

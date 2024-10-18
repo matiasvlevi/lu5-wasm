@@ -1,16 +1,17 @@
 import {
     lu5_bindings_unimplemented,
+    makeEnv,
     wasi_snapshot_preview1_unimplemented
 } from "./unimplemented";
-import { WebAssemblyInstance, type PlatformFunction } from "./types";
+import { LU5Console, WebAssemblyInstance, type PlatformFunction } from "./types";
 
 import * as wasi_snapshot_preview1 from "./wasi";
 import * as bindings from './platform/index'
 import { write_cstr } from "./memory";
 import { colorToHex, colorToRGBA } from "./color";
-import { LU5Console } from "./console"
 
 import * as glfw from './keyboard'
+import { LU5_WASM_CDN } from "./env";
 
 export class LU5 {
     readonly l5: number | null;
@@ -82,7 +83,9 @@ export class LU5 {
         const handlers = this.fd[fd];
         if (!handlers) return;
         handlers.forEach((c: Record<string, any>) => {
-            if (c[method]) c[method](msg);
+            if (c[method]) {
+                c[method](msg);
+            }
         });
     }
 
@@ -177,16 +180,7 @@ export class LU5 {
         }
     }
 
-    static makeEnv(bind: LU5, symbols: string[], implemented: Record<string, PlatformFunction>) {
-        const env: Record<string, PlatformFunction> = {};
-        const syms = [...new Set([...symbols, ...Object.keys(implemented)])];
-        for (let sym of syms) {
-            env[sym] = (implemented[sym] == undefined) ? (() => 0) : implemented[sym].bind(bind);
-        }
-        return env;
-    }
-
-    static async compile(lu5_wasm_path: string): Promise<WebAssembly.Module> {
+    static async compile(lu5_wasm_path: string = LU5_WASM_CDN): Promise<WebAssembly.Module> {
         const response = await fetch(lu5_wasm_path);
         const buffer = await response.arrayBuffer();
         return await WebAssembly.compile(buffer);
@@ -202,10 +196,10 @@ export class LU5 {
 
         lu5.wasm = await WebAssembly.instantiate(module, {
             env: {
-                ...LU5.makeEnv(lu5, lu5_bindings_unimplemented, bindings),
+                ...makeEnv(lu5, lu5_bindings_unimplemented, bindings),
                 ...LU5.env
             },
-            wasi_snapshot_preview1: LU5.makeEnv(lu5, wasi_snapshot_preview1_unimplemented, wasi_snapshot_preview1)
+            wasi_snapshot_preview1: makeEnv(lu5, wasi_snapshot_preview1_unimplemented, wasi_snapshot_preview1)
         }) as WebAssemblyInstance
 
         lu5.memory = lu5.wasm.exports.memory as WebAssembly.Memory;
@@ -307,12 +301,6 @@ export class LU5 {
         this.calls._lu5_mouse_button_callback(null, e instanceof MouseEvent ? e.button : 0, 0, 0);
     }
 
-    execute(source: string): Promise<LU5> {
-        return new Promise(res => {
-            this.#run(source, () => res(this));
-        })
-    }
-
     #run(source: string, done: () => void = () => { }): void {
         if (!this.wasm) {
             this.warn('lu5 wasm hasn\'t loaded yet.');
@@ -380,6 +368,12 @@ export class LU5 {
                 done();
                 return;
         }
+    }
+
+    execute(source: string): Promise<LU5> {
+        return new Promise(res => {
+            this.#run(source, () => res(this));
+        })
     }
 
     async reset() {
