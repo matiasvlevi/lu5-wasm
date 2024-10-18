@@ -279,7 +279,7 @@ export class LU5 {
     handleMousedown(e: MouseEvent|TouchEvent) {
         if (!this.wasm) return;
 
-        if (e instanceof TouchEvent) {
+        if (!(e instanceof MouseEvent)) {
             const rect = this.ctx.canvas.getBoundingClientRect();
             console.log(e);
             this.mouseX = Math.round(e.changedTouches[0].clientX - rect.left);
@@ -292,7 +292,7 @@ export class LU5 {
     handleMouseup(e: MouseEvent|TouchEvent) {
         if (!this.wasm) return;
 
-        if (e instanceof TouchEvent) {
+        if (!(e instanceof MouseEvent)) {
             const rect = this.ctx.canvas.getBoundingClientRect();
             this.mouseX = Math.round(e.changedTouches[0].clientX - rect.left);
             this.mouseY = Math.round(e.changedTouches[0].clientY - rect.top); 
