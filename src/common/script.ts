@@ -24,7 +24,6 @@ export async function get_script(): Promise<{ id: string, source: string }> {
     const script = document.querySelectorAll('script[type="text/lua"]')[0];
 
     if (script == undefined) {
-        console.warn('No lua scripts found...');
         return { id: '', source: '' };
     }
 

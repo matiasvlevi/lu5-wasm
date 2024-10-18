@@ -1,4 +1,4 @@
-import { get_or_create_by_id, is_mobile } from "../common/dom";
+import { _createElement, is_mobile } from "../common/dom";
 import { LU5 } from "../lu5";
 
 export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _title_ptr: number, mode: number): number 
@@ -12,7 +12,7 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
         return 0;
     }
 
-    const canvas = get_or_create_by_id('canvas', this.canvas_id) as HTMLCanvasElement;
+    const canvas = _createElement('canvas', this.canvas_id) as HTMLCanvasElement;
     canvas.style.display = 'inline';
 
     if (w == 0 && h == 0) {
@@ -23,7 +23,7 @@ export function lu5_createWindow(this: LU5, _L: number, w: number, h: number, _t
     // Set dimensions
     canvas.width = w;
     canvas.height = h;
-    console.log(this.calls, this);
+
     this.calls._lu5_update_window_size(this.l5, w, h);
 
     // Set rendering context
