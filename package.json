@@ -1,6 +1,6 @@
 {
   "name": "lu5-wasm",
-  "version": "0.0.9c",
+  "version": "0.0.9d",
   "main": "src/lib.ts",
   "scripts": {
     "build": "webpack --config webpack.config.js"
