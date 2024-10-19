@@ -3,7 +3,10 @@
   "version": "0.0.9d",
   "main": "src/lib.ts",
   "scripts": {
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "sync": "rsync -av --include='*/' --include='*.min.js' --exclude='*' ./dist/ $LU5_PATH/site/static/lib",
+    "bsync": "npm run build ; npm run sync",
+    "clean": "rm -rf ./dist/*"
   },
   "keywords": [
     "lu5",
