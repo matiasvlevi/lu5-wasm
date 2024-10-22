@@ -16,7 +16,6 @@ const baseConfig = {
         ],
     },
     plugins: [
-        // This will make foobar available globally, so secondary can use it
         new webpack.ProvidePlugin({
             'get_or_create_by_id': path.resolve(__dirname, 'src/common/dom.ts'),
         }),
@@ -39,9 +38,8 @@ const lu5_wasm_lib = {
     entry: {
         'lu5-wasm-lib': './src/lib.ts'
     },
-
     experiments: {
-        outputModule: true, // Enables output as an ES module
+        outputModule: true
     },
     externalsType: "module",
     output: {

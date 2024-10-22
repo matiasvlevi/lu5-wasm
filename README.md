@@ -6,7 +6,6 @@ A minimal WebAssembly instantiator & javascript polyfill for the [lu5](https://g
 
 ## Current Limitations
 
-
 * No async 
 * No file i/o
 * No matrix transform stack (`translate`, `rotate`, `scale`)
@@ -63,13 +62,13 @@ Include a lu5 script with a `canvas` attribute referencing the canvas `id`
 
 ## Use `lu5-wasm` as a library
 
-For more specialized use cases, you may prefer to use `lu5-wasm` in library mode.
-This will disable the auto-execution of lua scripts in your document.
+For more specialized use cases, you may prefer to use `lu5-wasm` as an ES Module.
+This will disable the auto-execution of lua scripts in your document and export api functionality.
 
-Add the `lib` attribute to the script tag to enable library mode
+Use the `lu5-wasm-lib.min.js` bundle
 
 ```html
-<script src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm.min.js" lib></script>
+<script type="module" src="https://unpkg.com/lu5-wasm@latest/dist/lu5-wasm-lib.min.js"></script>
 ```
 
 <br/>
@@ -87,7 +86,7 @@ lu5.init()
         end
 
         function draw()
-            background('green');
+            background('purple');
         end
     `));
 ```
